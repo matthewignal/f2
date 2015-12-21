@@ -1,4 +1,4 @@
-# fin2
+# Final pt. 2
 Calculates total energy of the interaction between two identical cubes whose corresponding edges are parallel to coordinate axes.
 The total charge of the cubes is zero and the dipole momentum is one.
 
