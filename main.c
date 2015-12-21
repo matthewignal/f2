@@ -19,7 +19,8 @@ int main (void)
     double dist, dmin = 1.001, dmax = 4.;
     size_t dim = 6;
     int np = 20;
-    double vegas[20];
+    double vegas[20], vegaserr[20];
+    double time1, time2; 
 
     double dstep = (dmax - dmin) / (np - 1);
 
@@ -40,37 +41,44 @@ int main (void)
     gsl_monte_vegas_init (sv);
 
     dist = dmin;
-    
-       printf ("# Dist      Energy     ErrEst    Dipole\n");
-       for (int i = 0; i < np; i++)
-       {
-       gsl_monte_vegas_integrate (&G, xl, xu, dim, calls / 5, r, sv, &res,
-       &err);
 
-       do
-       {
-       gsl_monte_vegas_integrate (&G, xl, xu, dim, calls, r, sv, &res,
-       &err);
-   
-       }
-       
-       while (fabs (gsl_monte_vegas_chisq (sv) - 1.0) > 0.2);
+    timer_start ();
+
+    // printf ("# Dist      Energy     ErrEst    Dipole\n");
+    for (int i = 0; i < np; i++)
+    {
+        gsl_monte_vegas_integrate (&G, xl, xu, dim, calls / 5, r, sv, &res,
+            &err);
+
+        do
+        {
+            gsl_monte_vegas_integrate (&G, xl, xu, dim, calls, r, sv, &res,
+                &err);
+        }
+
+        while (fabs (gsl_monte_vegas_chisq (sv) - 1.0) > 0.2);
 
 
-        printf ("% .6f  % .6f % .6f  % .6f\n", dist, res, err, -2. / pow (dist, 3.));
-       
-       fflush (stdout);
+        //printf ("% .6f  % .6f % .6f  % .6f\n", dist, res, err,
+        //    -2. / pow (dist, 3.));
 
-       dist += dstep;
-       }
+        //fflush (stdout);
+        vegas[i] = res;
+        vegaserr[i] = err;
 
-       gsl_monte_vegas_free (sv);
-     
+        dist += dstep;
+    }
+
+    time1 = timer_stop ();
+
+    gsl_monte_vegas_free (sv);
 
     dist = dmin;
-    printf ("# Dist      Energy      Dipole\n");
+    printf ("# Dist      HMC        Vegas      Verr       Dipole    Difference\n");
 
     double t[6];
+
+    timer_start ();
 
     for (int i = 0; i < np; i++)
     {
@@ -85,13 +93,20 @@ int main (void)
             sum += g (t, dim, &dist);
         }
         double energy = sum / calls;
+        double difference = fabs (energy - vegas[i]);
 
-        printf ("% .6f  % .6f % .6f  % .6f\n", dist, energy, vegas[i], -2. / pow (dist, 3.));
+        printf ("% .6f  % .6f % .6f  % .6f  % .6f  % .6f\n", 
+            dist, energy, vegas[i], vegaserr[i], -2./pow(dist, 3.), difference );
         dist += dstep;
+     
+     }
 
-    }
-
+   time2 = timer_stop ();
+    printf ("Time Vegas: %.2f Time HMC: %.2f\n", time1, time2);
+    printf ("Speedup: %.2f\n", time1 / time2);
+ 
     gsl_rng_free (r);
+     
 
     return 0;
 }

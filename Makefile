@@ -15,10 +15,10 @@ LDLIBS    = $(shell gsl-config --libs)
 
 .PHONY: clean veryclean all
 
-main: main.o two-cubes-integrand2.o
+main: main.o two-cubes-integrand2.o timer.o
 	${CC} $(LFLAGS) -o $@ $^ $(LDLIBS)
 
-res: main
+res:  main
 	./main > res
 
 mc-pi1.png: mc-pi1.gp res
