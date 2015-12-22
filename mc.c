@@ -1,5 +1,5 @@
 /*
- * Monte Carlo pi calculation
+ * Monte Carlo
  */
 
 #include <gsl/gsl_rng.h>
