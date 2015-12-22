@@ -1,5 +1,5 @@
 /* 
- * Monte Carlo calculation Pi
+ * Calculation of Integral
  */
 #include <stdio.h>
 
@@ -42,6 +42,8 @@ int main (void)
 
     dist = dmin;
 
+// Vegas algorithm calculation
+
     timer_start ();
 
     // printf ("# Dist      Energy     ErrEst    Dipole\n");
@@ -77,7 +79,9 @@ int main (void)
     printf ("# Dist      HMC        Vegas      Verr       Dipole    Difference\n");
 
     double t[6];
-
+    
+// Calculation using homemade Monte Carlo algorithm
+    
     timer_start ();
 
     for (int i = 0; i < np; i++)
